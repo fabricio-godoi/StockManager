@@ -4,7 +4,9 @@ Android Application for Demonstration Purposes
 This application has the following features:
 
 1- A demonstration of a dashboard in the main screen, using the [Android MP Chart](https://github.com/PhilJay/MPAndroidChart) library;
+
 2- QRCode reader feature that uses the main camera to check for any QRCode;
+
 3- A image capture feature that sends the pictures taken to a FTP Server configured in the [Constants](https://github.com/fabricio-godoi/StockManager/blob/master/app/src/main/java/com/example/stockmanager/config/Constants.java) file;
 
 
