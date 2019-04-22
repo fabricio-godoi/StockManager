@@ -9,8 +9,8 @@ This application has the following features:
 
 
 # Dashboard
-![Bar Chart](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/barChart.png)
-![Pie Chart](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/pieChart.png)
+![Bar Chart](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/barChart.png | width=250)
+![Pie Chart](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/pieChart.png | width=250)
 ![Line Chart](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/lineChart.png)
 
 
@@ -18,16 +18,17 @@ This application has the following features:
 
 The camera view will keep checking for any QRCode that appear in the screen.
 When a QRCode is found, the information the saved in the internal APK configuration file.
-![QRCode](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeReader.png)
 
 Every QRCode found can be accessed in the left pane in the in the "QR Code" option.
 A list with the QRCodes will popup, and any selected will open the browser with the select code.
 This is useful to reopen any code that is a URL for a site.
 
-
-![Left Pane](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/leftMenu.png)
-
-![Code List](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeSelect.png)
-
 Also any file select in the "Gallery" option will be check for a QRCode. If any QRCode is found, then
 the QRCode Reader screen will popup with the image and the QRCode above it.
+
+![QRCode](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeReader.png | width=250)
+
+
+![Left Pane](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/leftMenu.png | width=250)
+
+![Code List](https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeSelect.png | width=250)
