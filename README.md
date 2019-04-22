@@ -9,11 +9,11 @@ This application has the following features:
 
 
 # Dashboard
-<img src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/barChart.png" width="400" height="600">
+<img align="middle" src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/barChart.png" width="320" height="480">
 
-<img src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/pieChart.png" width="400" height="600">
+<img align="middle" src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/pieChart.png" width="320" height="480">
 
-<img src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/lineChart.png" width="400" height="600">
+<img align="middle" src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/lineChart.png" width="320" height="480">
 
 
 # QRCode reader
@@ -28,8 +28,8 @@ This is useful to reopen any code that is a URL for a site.
 Also any file select in the "Gallery" option will be check for a QRCode. If any QRCode is found, then
 the QRCode Reader screen will popup with the image and the QRCode above it.
 
-<img src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeReader.png" width="400" height="600">
+<img align="middle" src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeReader.png" width="320" height="480">
 
-<img src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/leftMenu.png" width="400" height="600">
+<img align="middle" src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/leftMenu.png" width="320" height="480">
 
-<img src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeSelect.png" width="400" height="600">
+<img align="middle" src="https://github.com/fabricio-godoi/StockManager/blob/master/screenshots/qrCodeSelect.png" width="320" height="480">
