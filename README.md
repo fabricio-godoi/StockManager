@@ -18,6 +18,8 @@ This application has the following features:
 
 The camera view will keep checking for any QRCode that appear in the screen.
 When a QRCode is found, the information the saved in the internal APK configuration file.
+To restart the QRCode reader, after already read one code, just tap the image holder to start searching again, or
+swipe left and right again.
 
 Every QRCode found can be accessed in the left pane in the in the "QR Code" option.
 A list with the QRCodes will popup, and any selected will open the browser with the select code.
