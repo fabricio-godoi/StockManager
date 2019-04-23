@@ -2,6 +2,7 @@ package com.example.stockmanager.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -99,6 +100,8 @@ public class TakePictureActivity extends Activity {
                 File picture = null;
                 if(image != null) {
                     picture = new File(image.getPath());
+                    // Notify Android Gallery that the image has been created
+                    MediaScannerConnection.scanFile(this, new String[] { picture.getPath() }, new String[] { "image/jpeg" }, null);
                 }
 
                 // If the picture was found and taken, notify any activity that is waiting for it

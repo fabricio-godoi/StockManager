@@ -60,63 +60,67 @@ public class QRCodeReader extends CameraPreview{
         public void run() {
             qrCodeFound = false;
             if (getCamera() != null) {
-                getCamera().setOneShotPreviewCallback(new Camera.PreviewCallback() {
-                    @Override
-                    public void onPreviewFrame(byte[] data, Camera camera) {
-                    // When a new frame arrives, transform it to a bitmap image to be parsed
-                    Camera.Parameters parameters = camera.getParameters();
-                    int width = parameters.getPreviewSize().width;
-                    int height = parameters.getPreviewSize().height;
-                    YuvImage yuv = new YuvImage(data, parameters.getPreviewFormat(), width, height, null);
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    yuv.compressToJpeg(new Rect(0, 0, width, height), 50, out);
-                    byte[] bytes = out.toByteArray();
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                try {
+                    getCamera().setOneShotPreviewCallback(new Camera.PreviewCallback() {
+                        @Override
+                        public void onPreviewFrame(byte[] data, Camera camera) {
+                            // When a new frame arrives, transform it to a bitmap image to be parsed
+                            Camera.Parameters parameters = camera.getParameters();
+                            int width = parameters.getPreviewSize().width;
+                            int height = parameters.getPreviewSize().height;
+                            YuvImage yuv = new YuvImage(data, parameters.getPreviewFormat(), width, height, null);
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            yuv.compressToJpeg(new Rect(0, 0, width, height), 50, out);
+                            byte[] bytes = out.toByteArray();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-                    // Check if the image rotation is right, checking with the device rotation
-                    final int rotation = ((WindowManager) CONTEXT.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
-                    switch (rotation) {
-                        case Surface.ROTATION_0:
-                            bitmap = rotateImage(bitmap, 90);
-                            break;
-                        case Surface.ROTATION_90:
-                            break;
-                        case Surface.ROTATION_180:
-                            bitmap = rotateImage(bitmap, 270);
-                            break;
-                        case Surface.ROTATION_270:
-                            bitmap = rotateImage(bitmap, 180);
-                            break;
-                        default:
-                            break;
-                    }
+                            // Check if the image rotation is right, checking with the device rotation
+                            final int rotation = ((WindowManager) CONTEXT.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+                            switch (rotation) {
+                                case Surface.ROTATION_0:
+                                    bitmap = rotateImage(bitmap, 90);
+                                    break;
+                                case Surface.ROTATION_90:
+                                    break;
+                                case Surface.ROTATION_180:
+                                    bitmap = rotateImage(bitmap, 270);
+                                    break;
+                                case Surface.ROTATION_270:
+                                    bitmap = rotateImage(bitmap, 180);
+                                    break;
+                                default:
+                                    break;
+                            }
 
-                    // Parse the image frame, to check if the has any QRCode in it
-                    Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-                    SparseArray<Barcode> barcodes = detector.detect(frame);
+                            // Parse the image frame, to check if the has any QRCode in it
+                            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+                            SparseArray<Barcode> barcodes = detector.detect(frame);
 
-                    // Check if there is any QRCode found
-                    if (barcodes.size() > 0) {
-                        // QRCode found, stop searching for it
-                        qrCodeFound = true;
-                        isSearchRunning = false;
-                        searchHandler.removeCallbacksAndMessages(null);
+                            // Check if there is any QRCode found
+                            if (barcodes.size() > 0) {
+                                // QRCode found, stop searching for it
+                                qrCodeFound = true;
+                                isSearchRunning = false;
+                                searchHandler.removeCallbacksAndMessages(null);
 
-                        try {
-                            // Send barcode information for the right application view
-                            Barcode thisCode = barcodes.valueAt(0);
-                            saveQRCode(thisCode.rawValue);
-                            EventBus.getDefault().post(new MessageEvent(MessageCode.QRCODE_CALLBACK, "RESULT", thisCode.rawValue));
-                        } catch (Exception e) {
-                            Log.e(TAG, "Could not send back the QRCode result", e);
+                                try {
+                                    // Send barcode information for the right application view
+                                    Barcode thisCode = barcodes.valueAt(0);
+                                    saveQRCode(thisCode.rawValue);
+                                    EventBus.getDefault().post(new MessageEvent(MessageCode.QRCODE_CALLBACK, "RESULT", thisCode.rawValue));
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Could not send back the QRCode result", e);
+                                }
+                            }
                         }
-                    }
-                    }
-                });
+                    });
 
-                // While the QRCode are not found, keep searching it in Constants.QRCODE_SEARCH_INTERVAL_MS interval
-                if (!qrCodeFound) {
-                    searchHandler.postDelayed(searchRunnable, Constants.QRCODE_SEARCH_INTERVAL_MS);
+                    // While the QRCode are not found, keep searching it in Constants.QRCODE_SEARCH_INTERVAL_MS interval
+                    if (!qrCodeFound) {
+                        searchHandler.postDelayed(searchRunnable, Constants.QRCODE_SEARCH_INTERVAL_MS);
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "Camera should not be available");
                 }
             }
         }
@@ -185,24 +189,6 @@ public class QRCodeReader extends CameraPreview{
     }
 
 
-    /**
-     * Check if a picture has some QRCode.
-     * If a QRCode is found and decoded, it will be returned.
-     * @param picture file that has the picture
-     * @return null if could not decode the picture, otherwise the decoded value
-     */
-    public String hasQRCode(File picture){
-        if (picture.isFile()) {
-            Bitmap bitmap = BitmapFactory.decodeFile(picture.getPath());
-            // If it was possible to decode the file, then is a picture
-            // if  bitmap is null, then is not a picture
-            if(bitmap != null) {
-                return hasQRCode(bitmap);
-            }
-        }
-        return  null;
-    }
-
     public String hasQRCode(Bitmap bitmap){
         Frame frame = new Frame.Builder().setBitmap(bitmap).build();
         SparseArray<Barcode> barcodes = detector.detect(frame);
@@ -220,6 +206,24 @@ public class QRCodeReader extends CameraPreview{
         }
 
         return null;
+    }
+
+    /**
+     * Check if a picture has some QRCode.
+     * If a QRCode is found and decoded, it will be returned.
+     * @param picture file that has the picture
+     * @return null if could not decode the picture, otherwise the decoded value
+     */
+    public String hasQRCode(File picture){
+        if (picture != null && picture.isFile()) {
+            Bitmap bitmap = BitmapFactory.decodeFile(picture.getPath());
+            // If it was possible to decode the file, then is a picture
+            // if  bitmap is null, then is not a picture
+            if(bitmap != null) {
+                return hasQRCode(bitmap);
+            }
+        }
+        return  null;
     }
 
     /**

@@ -17,6 +17,7 @@
     <string name="camera_permission_not_granted">Camera permission denied</string>
     <string name="sales_state">Sales per State</string>
     <string name="sales_flow">Sales Cash Flow</string>
+    <string name="qrcode_not_found">QRCode not found!</string>
 
 
 </resources>

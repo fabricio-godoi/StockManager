@@ -24,6 +24,7 @@ import com.example.stockmanager.camera.QRCodeReader;
 import com.example.stockmanager.eventbus.MessageEvent;
 import com.example.stockmanager.services.NetworkService;
 
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,6 +70,11 @@ public class MainActivity extends AppCompatActivity
 
     private static final int REQUEST_PERMISSIONS_CODE = 0;
     private static final int PICK_IMAGE = 1;
+    private static final int NUMBER_OF_PAGES = 2;
+
+    private static final int DASHBOARD_PAGE = 0;
+    private static final int CAMERA_PAGE = 1;
+
 
     LayoutInflater inflater;    //Used to create individual pages
     ViewPager viewPager;        //Reference to class to swipe views
@@ -275,14 +281,7 @@ public class MainActivity extends AppCompatActivity
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                     if (bitmap != null) {
-                        String decode = qrCodeReader.hasQRCode(bitmap);
-                        if(decode != null){
-                            isSilentChange = true;
-                            viewPager.setCurrentItem(2);
-                            qrCodeResultView.setText(decode);
-                            cameraPreview.setBackground(new BitmapDrawable(getResources(), bitmap));
-                            cameraPreview.getChildAt(0).setVisibility(View.INVISIBLE);
-                        }
+                        onDecodeImage(bitmap);
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "Could not format image", e);
@@ -325,7 +324,7 @@ public class MainActivity extends AppCompatActivity
         public void onPageSelected(int position) {
             // Check if this is the page you want.
             switch (position){
-                case 1:
+                case CAMERA_PAGE:
                     ((FloatingActionButton) findViewById(R.id.fab)).hide();
 
                     // Check if the permissions were granted to start the QRCode reader properly
@@ -344,7 +343,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                     break;
-                case 0:
+                case DASHBOARD_PAGE:
                 default:
                     ((FloatingActionButton) findViewById(R.id.fab)).show();
                     isSilentChange = false;
@@ -371,7 +370,7 @@ public class MainActivity extends AppCompatActivity
         public int getCount() {
             //Return total pages, here one for each data item
 //            return pageData.length;
-            return 2;
+            return NUMBER_OF_PAGES;
         }
 
         //Create the given page (indicated by position)
@@ -379,7 +378,7 @@ public class MainActivity extends AppCompatActivity
         public Object instantiateItem(ViewGroup container, int position) {
             View page = null;
             switch (position){
-                case 1:
+                case CAMERA_PAGE:
                     page = inflater.inflate(R.layout.qrcode_page, null);
                     ((ViewPager) container).addView(page, position);
                     cameraPreview = (LinearLayout) findViewById(R.id.cPreview);
@@ -392,7 +391,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     break;
-                case 0:
+                case DASHBOARD_PAGE:
                 default:
 //                    takePictureHandler.removeCallbacksAndMessages(null);
                     page = inflater.inflate(R.layout.dashboard_page, null);
@@ -462,6 +461,7 @@ public class MainActivity extends AppCompatActivity
             case TAKEPICTURE_CALLBACK:
                 try {
                     File picture = (File) event.args[0];
+
                     onDecodeImage(picture);
                 } catch (Exception e) {
                     Log.e(TAG, "Could not parse image from TakePictureActivity", e);
@@ -473,21 +473,32 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Try to decode a image and update the UI
-     * @param picture
+     * @param bitmap Picture in bitmap format
+     */
+    void onDecodeImage(Bitmap bitmap){
+        if (bitmap != null) {
+            String decode = qrCodeReader.hasQRCode(bitmap);
+            if(decode != null){
+                qrCodeResultView.setText(decode);
+            }
+            else{
+                qrCodeResultView.setText(getResources().getString(R.string.qrcode_not_found));
+            }
+            isSilentChange = true;
+            viewPager.setCurrentItem(CAMERA_PAGE);
+            cameraPreview.setBackground(new BitmapDrawable(getResources(), bitmap));
+            cameraPreview.getChildAt(0).setVisibility(View.INVISIBLE);
+        }
+    }
+
+    /**
+     * Try to decode a image and update the UI
+     * @param picture file of the picture taken
      */
     private void onDecodeImage(File picture){
         try {
             Bitmap bitmap = BitmapFactory.decodeFile(picture.getPath());
-            if (bitmap != null) {
-                String decode = qrCodeReader.hasQRCode(picture);
-                if(decode != null){
-                    isSilentChange = true;
-                    viewPager.setCurrentItem(2);
-                    qrCodeResultView.setText(decode);
-                    cameraPreview.setBackground(new BitmapDrawable(getResources(), bitmap));
-                    cameraPreview.getChildAt(0).setVisibility(View.INVISIBLE);
-                }
-            }
+            onDecodeImage(bitmap);
         } catch (Exception e) {
             Log.e(TAG, "Could not parse image from TakePictureActivity", e);
         }
