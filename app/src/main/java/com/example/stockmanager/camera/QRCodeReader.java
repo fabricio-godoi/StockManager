@@ -231,7 +231,6 @@ public class QRCodeReader extends CameraPreview{
      * @param qrcode string value of the qrcode
      */
     private void saveQRCode(String qrcode){
-        // Check if the simulated offline mode is saved set or not
         SharedPreferences settings = CONTEXT.getSharedPreferences("qrcode_list", MODE_PRIVATE);
         Set<String> qrCodes = new HashSet<>();
         qrCodes = settings.getStringSet("qrcode_list", qrCodes);

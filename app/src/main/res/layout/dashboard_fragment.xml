@@ -4,14 +4,45 @@
     android:layout_height="match_parent">
 
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="30sp"
-        android:text="@string/sales_state"
-        android:padding="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center_vertical|center_horizontal"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:text="@string/sales_state"
+            android:textSize="30sp"
+            />
+
+        <Button
+            android:id="@+id/addProduct"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/round_button"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="+"
+            android:textSize="20sp"
+            android:textColor="#fff" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/barChartTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
         android:layout_margin="10dp"
+        android:padding="10dp"
+        android:text="@string/products_values"
+        android:textSize="20sp"
         />
 
     <com.github.mikephil.charting.charts.BarChart
@@ -20,6 +51,19 @@
         android:layout_height="300dp"
         android:layout_margin="10dp"
         android:padding="10dp"
+        />
+
+
+
+    <TextView
+        android:id="@+id/pieChartTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:text="@string/products_values_per_state"
+        android:textSize="20sp"
         />
 
     <com.github.mikephil.charting.charts.PieChart

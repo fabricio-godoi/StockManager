@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 
 import com.example.stockmanager.R;
 import com.example.stockmanager.camera.QRCodeReader;
+import com.example.stockmanager.database.Database;
 import com.example.stockmanager.eventbus.MessageEvent;
 import com.example.stockmanager.services.NetworkService;
 
@@ -47,6 +48,8 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         /*
          * Manage application settings
          */
-
+        Database.getInstance(CONTEXT).load();
 
 
         /*
@@ -401,12 +404,57 @@ public class MainActivity extends AppCompatActivity
                     LinearLayout ln = findViewById(R.id.dashboardLayout);
 
                     FragmentManager fragMan = getFragmentManager();
-                    FragmentTransaction fragTransaction = fragMan.beginTransaction();
+                    final FragmentTransaction fragTransaction = fragMan.beginTransaction();
 
-                    ChartsFragment charts = new ChartsFragment();
+                    final ChartsFragment charts = new ChartsFragment();
                     fragTransaction.add(ln.getId(), charts, "dashboard_fragment");
                     fragTransaction.commit();
 
+
+                    // Manage product creation view
+
+                    Button accept = findViewById(R.id.acceptButton);
+                    Button cancel = findViewById(R.id.cancelButton);
+                    Button wipe = findViewById(R.id.wipeButton);
+
+                    accept.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String sName = ((EditText) findViewById(R.id.stateName)).getText().toString();
+                            String pName = ((EditText) findViewById(R.id.productName)).getText().toString();
+                            String pValue = ((EditText) findViewById(R.id.productValue)).getText().toString();
+                            try {
+                                Double value = Double.parseDouble(pValue);
+                                Database.getInstance(CONTEXT).createProduct(pName, value, sName);
+                                charts.updateView();
+                                findViewById(R.id.productRegScrollView).setVisibility(View.GONE);
+                                findViewById(R.id.dashboardScrollView).setVisibility(View.VISIBLE);
+                            } catch (Exception e) {
+                                Toast.makeText(CONTEXT, getResources().getString(R.string.value_not_supported), Toast.LENGTH_LONG);
+                            }
+
+                        }
+                    });
+
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            findViewById(R.id.productRegScrollView).setVisibility(View.GONE);
+                            findViewById(R.id.dashboardScrollView).setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    wipe.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                Database.getInstance(CONTEXT).wipe();
+                                charts.updateView();
+                            } catch (Exception e) {
+                                Log.e(TAG, "Could not wipe the database", e);
+                            }
+                        }
+                    });
 
                     break;
 

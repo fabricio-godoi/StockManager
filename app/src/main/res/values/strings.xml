@@ -18,6 +18,17 @@
     <string name="sales_state">Sales per State</string>
     <string name="sales_flow">Sales Cash Flow</string>
     <string name="qrcode_not_found">QRCode not found!</string>
+    <string name="state_name">State Name</string>
+    <string name="product_name">Product Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="accept">Accept</string>
+    <string name="value_not_supported">Wrong value informed</string>
+    <string name="product_value">Product Value</string>
+    <string name="wipeData">Wipe Database</string>
+    <string name="products_values">Sum of All Products Value</string>
+    <string name="products_values_per_state">Total Value of Products per State</string>
+    <string name="add_more_states">Add a state for more information</string>
+    <string name="add_more_product">Add a product for more information</string>
 
 
 </resources>

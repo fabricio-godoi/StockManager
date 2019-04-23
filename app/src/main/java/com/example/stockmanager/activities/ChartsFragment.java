@@ -1,6 +1,8 @@
 package com.example.stockmanager.activities;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -11,11 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.stockmanager.R;
+import com.example.stockmanager.database.Database;
+import com.example.stockmanager.model.Product;
+import com.example.stockmanager.model.State;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -88,6 +96,19 @@ public class ChartsFragment extends Fragment {
             // Configure animations and transitions
             rootAnimation.setDuration(ANIMATION_TIME);
             rootView.setAnimation(rootAnimation);
+
+
+            rootView.findViewById(R.id.addProduct).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    rootView.getRootView().findViewById(R.id.dashboardScrollView).setVisibility(View.GONE);
+                    ((EditText)rootView.getRootView().findViewById(R.id.stateName)).setText("");
+                    ((EditText)rootView.getRootView().findViewById(R.id.productName)).setText("");
+                    ((EditText)rootView.getRootView().findViewById(R.id.productValue)).setText("");
+                    rootView.getRootView().findViewById(R.id.productRegScrollView).setVisibility(View.VISIBLE);
+                }
+            });
+
 
 //            FrameLayout fl = new FrameLayout(getContext());
 //            fl.setId(View.generateViewId());
@@ -307,11 +328,18 @@ public class ChartsFragment extends Fragment {
             barChart.setDescription(null);
             barChart.getLegend().setEnabled(true);
 
-            // Convert heart rate data to bar entries
-//            List<BarEntry> entryList = generateBarData();
-
-            // Setup the data
+            // Convert the data from database for the charts
             List<IBarDataSet> bdt = generateBarData();
+
+            // Check if have some data to display
+            if(bdt == null || bdt.size() <= 0){
+                barChart.setVisibility(View.GONE);
+                ((TextView)rootView.findViewById(R.id.barChartTitle)).setText(getResources().getString(R.string.add_more_product));
+                return;
+            } else {
+                ((TextView)rootView.findViewById(R.id.barChartTitle)).setText(getResources().getString(R.string.products_values));
+                barChart.setVisibility(View.VISIBLE);
+            }
 
             // add a lot of colors
 
@@ -346,13 +374,24 @@ public class ChartsFragment extends Fragment {
             pieChart.setDescription(null);
             pieChart.getLegend().setEnabled(true);
 
-            // Convert heart rate data to bar entries
+
+            // Convert the data from database for the charts
             List<PieEntry> entryList = generatePieData();
+
+            // Check if have some data to display
+            if(entryList == null || entryList.size() <= 0){
+                pieChart.setVisibility(View.GONE);
+                ((TextView)rootView.findViewById(R.id.pieChartTitle)).setText(getResources().getString(R.string.add_more_states));
+                return;
+            } else {
+                ((TextView)rootView.findViewById(R.id.pieChartTitle)).setText(getResources().getString(R.string.products_values_per_state));
+                pieChart.setVisibility(View.VISIBLE);
+            }
 
             // Setup the data
             PieDataSet pdt = new PieDataSet(entryList, "");
             pdt.setSliceSpace(5f); // Spacing between slices
-            pdt.setValueTextColor(Color.WHITE);
+//            pdt.setValueTextColor(Color.WHITE);
             pdt.setValueTextSize(24f);
 
 
@@ -406,17 +445,30 @@ public class ChartsFragment extends Fragment {
         for (int c : ColorTemplate.PASTEL_COLORS) colors.add(c);
         colors.add(ColorTemplate.getHoloBlue());
 
+
         List<IBarDataSet> dataList = new ArrayList<>();
-        Map<String, Integer> data = sales();
-        Iterator keys = data.keySet().iterator();
+
+        List<Product> products = Database.getInstance(CONTEXT).getProductList();
+        Map<String, Double> sumOfSameProducts = new HashMap<>();
+
+        for(Product p : products){
+            Double sum = sumOfSameProducts.get(p.getName());
+            if(sum == null){
+                sumOfSameProducts.put(p.getName(), p.getValue());
+            } else {
+                sum += p.getValue();
+                sumOfSameProducts.put(p.getName(), sum);
+            }
+        }
+
         int i = 0;
-        while(keys.hasNext()){
-            String key = (String) keys.next();
-            Integer value = data.get(key);
+        Iterator<String> it = sumOfSameProducts.keySet().iterator();
+        while(it.hasNext()){
+            String productName = it.next();
             List<BarEntry> bel = new ArrayList<>();
-            bel.add(new BarEntry(i++, (float) value));
-            BarDataSet bdt = new BarDataSet(bel,key);
-            bdt.setValueTextColor(Color.WHITE);
+            bel.add(new BarEntry(i++, new Float(sumOfSameProducts.get(productName))));
+            BarDataSet bdt = new BarDataSet(bel,productName);
+//            bdt.setValueTextColor(Color.WHITE);
             bdt.setValueTextSize(24f);
             bdt.setColor(colors.get(i));
             dataList.add(bdt);
@@ -431,12 +483,9 @@ public class ChartsFragment extends Fragment {
      */
     private List<PieEntry> generatePieData() {
         List<PieEntry> dataList = new ArrayList<>();
-        Map<String, Integer> data = sales();
-        Iterator keys = data.keySet().iterator();
-        while(keys.hasNext()){
-            String key = (String) keys.next();
-            Integer value = data.get(key);
-            dataList.add(new PieEntry((float) value, key));
+        List<State> states = Database.getInstance(CONTEXT).getStateList();
+        for(State state:states){
+            dataList.add(new PieEntry(new Float(state.getProductsValue()), state.getName()));
         }
 
         return dataList;
@@ -458,4 +507,11 @@ public class ChartsFragment extends Fragment {
         return sales;
     }
 
+    /**
+     * Update the view of the charts
+     */
+    public void updateView() {
+        drawBarChart();
+        drawPieChart();
+    }
 }
