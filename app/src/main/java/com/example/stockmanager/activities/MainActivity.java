@@ -29,6 +29,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 
 import com.example.stockmanager.services.SyncDataService;
@@ -48,6 +49,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -63,6 +65,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import static com.example.stockmanager.camera.QRCodeReader.rotateImage;
 
 
 public class MainActivity extends AppCompatActivity
@@ -340,8 +344,9 @@ public class MainActivity extends AppCompatActivity
                         if (qrCodeReader != null) {
                             qrCodeReader.stop();
                             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                            if (qrCodeResultView != null)
+                            if (qrCodeResultView != null) {
                                 qrCodeResultView.setText(getResources().getString(R.string.searching));
+                            }
                             qrCodeReader.start();
                         }
                     }
@@ -536,6 +541,26 @@ public class MainActivity extends AppCompatActivity
             }
             isSilentChange = true;
             viewPager.setCurrentItem(CAMERA_PAGE);
+
+
+            // Check if the image rotation is right, checking with the device rotation
+            final int rotation = ((WindowManager) CONTEXT.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_0:
+                    bitmap = rotateImage(bitmap, 90);
+                    break;
+                case Surface.ROTATION_90:
+                    break;
+                case Surface.ROTATION_180:
+                    bitmap = rotateImage(bitmap, 270);
+                    break;
+                case Surface.ROTATION_270:
+                    bitmap = rotateImage(bitmap, 180);
+                    break;
+                default:
+                    break;
+            }
+
             cameraPreview.setBackground(new BitmapDrawable(getResources(), bitmap));
             cameraPreview.getChildAt(0).setVisibility(View.INVISIBLE);
         }
