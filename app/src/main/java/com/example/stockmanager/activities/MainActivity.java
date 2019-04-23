@@ -450,6 +450,8 @@ public class MainActivity extends AppCompatActivity
                             try {
                                 Database.getInstance(CONTEXT).wipe();
                                 charts.updateView();
+                                findViewById(R.id.productRegScrollView).setVisibility(View.GONE);
+                                findViewById(R.id.dashboardScrollView).setVisibility(View.VISIBLE);
                             } catch (Exception e) {
                                 Log.e(TAG, "Could not wipe the database", e);
                             }
